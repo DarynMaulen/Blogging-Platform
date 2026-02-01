@@ -1,37 +1,35 @@
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Login</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
     <nav id="nav-root" class="container"></nav>
 
     <div class="container auth-container">
-        <div class="card" style="width: 100%; max-width:400px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-            <h2 style="text-align: center; margin-bottom: 24px;">Login</h2>
+        <div class="card auth-card">
+            <h2 class="auth-title">Login</h2>
 
             <div id="login-error" class="error"></div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: 600; font-size: 14px;">Email</label>
+            <div class="form-group">
+                <label class="form-label">Email</label>
                 <input id="login-email" class="input" placeholder="email@example.com" />
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: 600; font-size: 14px;">Password</label>
+            <div class="form-group">
+                <label class="form-label">Password</label>
                 <input id="login-password" type="password" class="input" placeholder="••••••••" />
             </div>
 
-            <div class="controls" style="margin-top:20px; flex-direction: column; gap: 10px;">
-                <button class="btn btn-primary" style="width: 100%;" onclick="Auth.login()">Login</button>
-                <div style="text-align: center; font-size: 13px; color: #666; margin-top: 10px;">
-                    Don't have an account? <a href="register.html"
-                        style="color: #1a73e8; text-decoration: none;">Register</a>
+            <div class="controls auth-controls">
+                <button id="login-btn" class="btn btn-primary full-width">Login</button>
+                
+                <div class="auth-footer">
+                    Don't have an account? <a href="register.html" class="auth-link">Register</a>
                 </div>
             </div>
         </div>
@@ -39,7 +37,5 @@
 
     <script src="js/common.js"></script>
     <script src="js/auth.js"></script>
-    <script>Auth.init();</script>
 </body>
-
 </html>
