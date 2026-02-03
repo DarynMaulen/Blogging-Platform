@@ -2,7 +2,6 @@ const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 const { Types } = require('mongoose');
 
-// Create comment (referenced) + push preview into post.commentsPreview (max 5)
 exports.createComment = async (req, res) => {
     let session = null;
     try {
@@ -15,10 +14,10 @@ exports.createComment = async (req, res) => {
         if (!post) return res.status(404).json({ message: 'Post not found' });
 
         const commentDoc = {
-            postId: Types.ObjectId(postId),
+            postId: new Types.ObjectId(postId),
             author: req.user._id,
             text,
-            parentId: parentId && Types.ObjectId.isValid(parentId) ? Types.ObjectId(parentId) : null
+            parentId: (parentId && Types.ObjectId.isValid(parentId)) ? new Types.ObjectId(parentId) : null
         };
 
         // Try transaction
@@ -109,7 +108,7 @@ exports.updateComment = async (req, res) => {
         await Post.updateOne(
             { _id: comment.postId },
             { $set: { 'commentsPreview.$[c].text': text.substring(0, 200) } },
-            { arrayFilters: [{ 'c._id': Types.ObjectId(id) }] }
+            { arrayFilters: [{ 'c._id': new Types.ObjectId(id) }] }
         );
 
         return res.json({ comment });
@@ -150,10 +149,15 @@ exports.deleteComment = async (req, res) => {
                 return res.status(404).json({ message: 'Comment not found (concurrent)' });
             }
 
-            await Post.updateOne(
+            // use comment._id (already an ObjectId) and pass { session } as option
+            const updateRes = await Post.updateOne(
                 { _id: comment.postId },
-                { $inc: { commentsCount: -1 }, $pull: { commentsPreview: { _id: Types.ObjectId(id) } } }
-            ).session(session);
+                { $inc: { commentsCount: -1 }, $pull: { commentsPreview: { _id: comment._id } } },
+                { session }
+            );
+
+            // helpful debug log (optional)
+            console.log('deleteComment - post update (transaction):', updateRes);
 
             await session.commitTransaction();
             session.endSession();
@@ -172,10 +176,12 @@ exports.deleteComment = async (req, res) => {
             const del = await Comment.deleteOne({ _id: comment._id });
             if (del.deletedCount === 0) return res.status(404).json({ message: 'Comment not found (concurrent)' });
 
-            await Post.updateOne(
+            const updateRes = await Post.updateOne(
                 { _id: comment.postId },
-                { $inc: { commentsCount: -1 }, $pull: { commentsPreview: { _id: Types.ObjectId(id) } } }
+                { $inc: { commentsCount: -1 }, $pull: { commentsPreview: { _id: comment._id } } }
             );
+
+            console.log('deleteComment - post update (fallback):', updateRes);
 
             await Post.updateOne({ _id: comment.postId, commentsCount: { $lt: 0 } }, { $set: { commentsCount: 0 } });
 
@@ -190,7 +196,6 @@ exports.deleteComment = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 // List comments for a post
 exports.listCommentsForPost = async (req, res) => {
