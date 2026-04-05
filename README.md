@@ -1,4 +1,4 @@
-﻿# Blogging — Final Project
+﻿# Blogging
 
 ### Project overview
 
