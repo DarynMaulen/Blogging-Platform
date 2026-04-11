@@ -62,14 +62,16 @@ const PostsPage = (() => {
         const pager = document.getElementById('pager');
         pager.innerHTML = '';
 
-        const prev = el('button', { class: 'btn', onclick: 'PostsPage.prev()' }, 'Prev');
+        const prev = el('button', { class: 'btn' }, 'Prev');
+        prev.addEventListener('click', PostsPage.prev);
         if (currentPage <= 1) {
             prev.disabled = true;
             prev.style.opacity = '0.5';
             prev.style.cursor = 'not-allowed';
         }
 
-        const next = el('button', { class: 'btn', onclick: 'PostsPage.next()' }, 'Next');
+        const next = el('button', { class: 'btn' }, 'Next');
+        next.addEventListener('click', PostsPage.next);
         if (currentPage >= totalPages) {
             next.disabled = true;
             next.style.opacity = '0.5';
@@ -100,6 +102,5 @@ const PostsPage = (() => {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('posts-root')) {
-        PostsPage.init();
     }
 });
