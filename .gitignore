@@ -1,3 +1,16 @@
+# env
 .env
-docker-stack.yml
+backend/.env
+
+# node
 node_modules/
+
+# logs
+logs
+*.log
+
+# docker
+docker-compose.override.yml
+
+# OS
+.DS_Store
