@@ -24,8 +24,10 @@ const PostForm = (() => {
         root.appendChild(el('div', {}, 'Status')); root.appendChild(status);
         root.appendChild(el('div', {}, 'Content')); root.appendChild(content);
 
-        const submitBtn = el('button', { class: 'btn btn-primary', onclick: 'PostForm.submit()' }, editMode ? 'Save' : 'Create');
-        const cancelBtn = el('button', { class: 'btn', onclick: 'PostForm.cancel()' }, 'Cancel');
+        const submitBtn = el('button', { class: 'btn btn-primary' }, 'Save');
+        submitBtn.addEventListener('click', submit);
+        const cancelBtn = el('button', { class: 'btn' }, 'Cancel');
+        cancelBtn.addEventListener('click', cancel);
         root.appendChild(el('div', { class: 'controls' }, ''));
         root.querySelector('.controls').appendChild(submitBtn);
         root.querySelector('.controls').appendChild(cancelBtn);

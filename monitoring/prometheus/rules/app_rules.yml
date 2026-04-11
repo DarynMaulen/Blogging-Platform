@@ -1,0 +1,22 @@
+groups:
+  - name: golden_signals
+    interval: 30s
+    rules:
+
+      - record: app:http_requests_per_second:5m
+        expr: sum(rate(http_requests_total{job="backend"}[5m]))
+
+      - record: app:http_error_ratio_percent:5m
+        expr: 100 * sum(rate(http_requests_total{job="backend",status=~"5.."}[5m])) / sum(rate(http_requests_total{job="backend"}[5m]))
+
+      - record: app:http_latency_p95:5m
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="backend"}[5m])) by (le))
+
+      - record: app:cpu_usage_percent:5m
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+      - record: app:slo_availability_percent:30d
+        expr: 100 * (1 - (sum(increase(http_requests_total{job="backend",status=~"5.."}[30d])) / sum(increase(http_requests_total{job="backend"}[30d]))))
+
+      - record: app:slo_write_success_percent:30d
+        expr: 100 * (sum(increase(http_requests_total{job="backend",method="POST",status!~"5.."}[30d])) / sum(increase(http_requests_total{job="backend",method="POST"}[30d])))

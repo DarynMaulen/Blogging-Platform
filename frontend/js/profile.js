@@ -53,7 +53,7 @@ const ProfilePage = (() => {
                 }, 'Edit'));
 
                 const delBtn = el('button', { class: 'btn btn-danger btn-sm' }, 'Delete');
-                delBtn.onclick = () => deletePost(p._id);
+                delBtn.addEventListener('click', () => deletePost(p._id));
 
                 controls.appendChild(delBtn);
                 row.appendChild(controls);
@@ -84,3 +84,9 @@ const ProfilePage = (() => {
 
     return { init, deletePost };
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('profile-root')) {
+        ProfilePage.init();
+    }
+});

@@ -32,22 +32,22 @@ const PostPage = (() => {
             root.appendChild(el('div', { class: 'post-content' }, p.content));
 
             const controls = el('div', { class: 'post-controls' });
-            controls.appendChild(el('button', { class: 'btn', onclick: 'PostPage.toggleLike()' }, `Like (${p.likes || 0})`));
+            const likeBtn = el('button', { class: 'btn' }, `Like (${p.likes || 0})`);
+            likeBtn.addEventListener('click', toggleLike);
+            controls.appendChild(likeBtn);
 
             const user = currentUser();
             const isAdmin = user && user.role === 'admin';
             const isOwner = user && p.author && user._id === p.author._id;
 
             if (isOwner || isAdmin) {
-                const editBtn = el('button', {
-                    class: 'btn',
-                    onclick: `location.href='post_form.html?id=${p._id}'`
-                }, 'Edit');
+                const editBtn = el('button', { class: 'btn' }, 'Edit');
+                editBtn.addEventListener('click', () => {
+                    location.href = `post_form.html?id=${p._id}`;
+                });
 
-                const delBtn = el('button', {
-                    class: 'btn btn-danger',
-                    onclick: 'PostPage.deletePost()'
-                }, 'Delete Post');
+                const delBtn = el('button', { class: 'btn btn-danger' }, 'Delete Post');
+                delBtn.addEventListener('click', deletePost);
 
                 controls.appendChild(editBtn);
                 controls.appendChild(delBtn);
@@ -95,14 +95,15 @@ const PostPage = (() => {
         div.appendChild(el('div', { class: 'comment-text' }, c.text));
 
         const actions = el('div', { class: 'comment-actions' });
-        if (currentUser()) {
-            actions.appendChild(el('button', { class: 'btn-reply', onclick: `PostPage.replyTo('${c._id}', '${c.author?.username || 'User'}')` }, 'Reply'));
-        }
+        const replyBtn = el('button', { class: 'btn-reply' }, 'Reply');
+        replyBtn.addEventListener('click', () =>
+            replyTo(c._id, c.author?.username || 'User')
+        );
+        actions.appendChild(replyBtn);
 
-        const user = currentUser();
-        if (user && (user._id === (c.author?._id || c.author) || user.role === 'admin')) {
-            actions.appendChild(el('button', { class: 'btn-delete-comment', onclick: `PostPage.deleteComment('${c._id}')` }, 'Delete'));
-        }
+        const delBtn = el('button', { class: 'btn-delete-comment' }, 'Delete');
+        delBtn.addEventListener('click', () => deleteComment(c._id));
+        actions.appendChild(delBtn);
 
         div.appendChild(actions);
         return div;
@@ -120,7 +121,9 @@ const PostPage = (() => {
 
         root.appendChild(el('div', { id: 'reply-status', style: 'display:none' }));
         root.appendChild(el('textarea', { id: 'comment-text', class: 'form-control', placeholder: 'Write a comment...' }));
-        root.appendChild(el('button', { class: 'btn btn-primary', onclick: 'PostPage.submitComment()' }, 'Post comment'));
+        const submitBtn = el('button', { class: 'btn btn-primary' }, 'Post comment');
+        submitBtn.addEventListener('click', submitComment);
+        root.appendChild(submitBtn);
         root.appendChild(el('div', { id: 'comment-error', class: 'error' }));
     }
 
@@ -128,7 +131,12 @@ const PostPage = (() => {
         currentParentId = commentId;
         const status = document.getElementById('reply-status');
         status.style.display = 'block';
-        status.innerHTML = `Replying to <b>${username}</b> <span class="cancel-reply" onclick="PostPage.cancelReply()">✕ Cancel</span>`;
+        status.innerHTML = `Replying to <b>${username}</b> `;
+
+        const cancelSpan = el('span', { class: 'cancel-reply' }, '✕ Cancel');
+        cancelSpan.addEventListener('click', cancelReply);
+
+        status.appendChild(cancelSpan);
         document.getElementById('comment-text').focus();
     }
 

@@ -157,3 +157,9 @@ const StatsPage = (() => {
 
     return { init };
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('top-posts-root')) {
+        StatsPage.init();
+    }
+});
