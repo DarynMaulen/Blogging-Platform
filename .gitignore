@@ -1,2 +1,3 @@
 .env
+docker-stack.yml
 node_modules/
