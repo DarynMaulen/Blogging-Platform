@@ -102,5 +102,6 @@ const PostsPage = (() => {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('posts-root')) {
+        PostsPage.init();
     }
 });
